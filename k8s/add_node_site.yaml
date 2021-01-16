@@ -1,0 +1,11 @@
+---
+- hosts: add_node
+  remote_user: root
+  gather_facts: True
+  roles:
+    - docker_install
+- hosts: master
+  remote_user: root
+  gather_facts: True
+  roles:
+    - add_node

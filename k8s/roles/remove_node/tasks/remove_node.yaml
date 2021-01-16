@@ -1,0 +1,10 @@
+- name: 设置节点为维护模式
+  shell: "ansible master -i /home/k8s/hosts -m shell -a 'kubectl drain {{ hostname }} --delete-local-data --force --ignore-daemonsets'"
+  connection: local
+  args:
+    warn: False
+- name: 在master上删除
+  local_action: shell ansible master -i /home/k8s/hosts -m shell -a 'kubectl delete node {{ hostname }}'
+- name: 剔除节点
+  shell: kubeadm reset -f 
+   

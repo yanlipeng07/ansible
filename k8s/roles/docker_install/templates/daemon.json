@@ -1,0 +1,5 @@
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "insecure-registries":["10.121.218.110"]
+}
+

@@ -1,0 +1,8 @@
+- name: 分发flannel镜像
+  local_action: shell ansible all -i /home/k8s/hosts -m copy -a "src=/home/k8s/roles/flannel_install/files/flannel.tar dest={{SOURCE_DIR}}"
+- name: 拉取镜像
+  local_action: shell ansible all -i /home/k8s/hosts -m shell -a 'docker load -i {{SOURCE_DIR}}/flannel.tar'
+- name: 拷贝flannel.yaml
+  template: src=flannel.yaml dest={{SOURCE_DIR}}
+- name: 部署flannel
+  shell: kubectl apply -f {{SOURCE_DIR}}/flannel.yaml

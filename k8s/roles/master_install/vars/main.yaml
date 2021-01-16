@@ -1,0 +1,4 @@
+SOURCE_DIR: /software
+VERSION: v1.19.2
+POD_CIDR: 10.96.0.0/12
+MASTER_IP: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"

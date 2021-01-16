@@ -1,0 +1,35 @@
+- name: 集群初始化准备1
+  shell: "swapoff -a && kubeadm reset -f"
+
+- name: 集群初始化准备2
+  shell: "systemctl daemon-reload && systemctl restart kubelet"
+  
+- name: 集群初始化
+  shell: "kubeadm init --kubernetes-version={{VERSION}} --apiserver-advertise-address={{MASTER_IP}} --image-repository registry.aliyuncs.com/google_containers --service-cidr=10.1.0.0/16 --pod-network-cidr={{POD_CIDR}} &>{{ SOURCE_DIR }}/token"
+
+- name: 获取node的token
+  shell: "grep -A1 'kubeadm join' {{ SOURCE_DIR }}/token |tail -2 > {{ SOURCE_DIR }}/node.sh"
+- name: 
+  shell: cat {{ SOURCE_DIR }}/node.sh
+  register: nodeinfo
+- set_fact: node={{nodeinfo.stdout}}
+- name: 本机创建存放node.sh路径
+  local_action: shell mkdir -p {{ SOURCE_DIR }}
+- name: 获取node.sh
+  local_action: shell echo {{node}} > {{ SOURCE_DIR }}/node.sh
+- name: 分发node.sh
+  shell: "ansible node -m template -a 'src={{ SOURCE_DIR }}/node.sh dest={{ SOURCE_DIR }}'"
+  connection: local
+  args:
+    warn: False
+
+- name: 判断是否存在
+  shell: if [ -d $HOME/.kube ];then rm -rf $HOME/.kube;fi
+- name: 创建 $HOME/.kube 目录
+  file: name=$HOME/.kube state=directory
+  
+- name: 拷贝KubeConfig
+  shell: \cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+- name: 修改权限
+  shell: chown $(id -u):$(id -g) $HOME/.kube/config
+ 

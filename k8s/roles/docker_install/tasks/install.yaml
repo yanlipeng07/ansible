@@ -1,0 +1,49 @@
+- name: 创建software目录
+  file: name={{ SOURCE_DIR }} state=directory
+
+- name: 更改hostname
+  raw: "echo {{ hostname }} > /etc/hostname"
+
+- name: 更改生效
+  shell: "hostname {{ hostname }}"
+
+- name: 设置本地hosts
+  shell: "if [ `grep '{{ ansible_ssh_host }} {{ hostname }}' /etc/hosts |wc -l` -eq 0 ]; then echo {{ ansible_ssh_host }} {{ hostname }} >> /etc/hosts; fi"
+
+- name: 设置docker源
+  shell: "yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo"
+
+- name: 安装docker-ce
+  yum: 
+    name: "docker-ce-{{ dockerVersion }}"
+    state: present
+    disable_gpg_check: yes
+
+- name: 启动docker并开机启动
+  service:
+    name: docker
+    state: started
+    enabled: yes
+    
+- name: 配置docker
+  template: src=daemon.json dest=/etc/docker/daemon.json
+
+- name: 重启docker
+  service:
+    name: docker
+    state: restarted
+    
+- name: 配置kubernetes源
+  template: src=kubernetes.repo dest=/etc/yum.repos.d/kubernetes.repo
+
+- name: 安装kubeadm、kubelet、kubectl
+  shell: "yum install -y kubeadm-{{ VERSION }} kubelet-{{ VERSION }} kubectl-{{ VERSION }}"
+  args:
+    warn: False
+
+- name: 启动kubelet并开机启动
+  service:
+    name: kubelet
+    state: started
+    enabled: yes
+ 

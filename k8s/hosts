@@ -1,0 +1,12 @@
+[master]
+10.121.218.120 hostname=master ansible_ssh_user=root ansible_ssh_pass=ailink@2020
+
+[node]
+10.121.218.121 hostname=node1 ansible_ssh_user=root ansible_ssh_pass=ailink@2020
+10.121.218.122 hostname=node2 ansible_ssh_user=root ansible_ssh_pass=ailink@2020
+
+[add_node]
+10.121.218.123 hostname=node3 ansible_ssh_user=root ansible_ssh_pass=ailink@2020
+
+[remove_node]
+10.121.218.122 hostname=node2 ansible_ssh_user=root ansible_ssh_pass=ailink@2020
